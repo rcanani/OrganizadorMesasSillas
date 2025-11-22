@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lista de Novios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f4f1ec; /* nude / blanco humo cálido */
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #374151;
+    }
+
+    .page-wrapper {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 15px 40px;
+      box-sizing: border-box;
+    }
+
+    .gift-layout {
+      padding: 24px 20px 26px;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+      border-top: 6px solid #6b8f3f; /* verde oliva */
+    }
+
+    .gift-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .gift-header h1 {
+      margin: 0 0 6px;
+      font-size: 1.9rem;
+      letter-spacing: 0.03em;
+    }
+
+    .gift-header p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #6b7280;
+    }
+
+    .gift-header .couple-names {
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .notice-box {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #fdf7ea;
+      border: 1px solid #f2e1b5;
+      font-size: 0.85rem;
+      color: #6b4f1f;
+    }
+
+    .gift-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .gift-card {
+      background: #f9f7f3;
+      border-radius: 16px;
+      border: 1px solid #e5dfd4;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .gift-image-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 60%; /* proporción 16:9 aprox */
+      overflow: hidden;
+      background: #e5dfd4;
+    }
+
+    .gift-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .gift-card:hover .gift-image {
+      transform: scale(1.05);
+    }
+
+    .gift-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .gift-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .gift-desc {
+      font-size: 0.87rem;
+      color: #6b7280;
+      line-height: 1.45;
+    }
+
+    .gift-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+
+    .gift-status {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-available {
+      background: #edf7ec;
+      color: #256029;
+      border: 1px solid #c8e6c9;
+    }
+
+    .status-reserved {
+      background: #fdf3e7;
+      color: #92400e;
+      border: 1px solid #f3c48a;
+    }
+
+    .gift-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-main,
+    .btn-ghost {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.87rem;
+      font-weight: 600;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.15s, background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-main {
+      background: #6b8f3f; /* verde oliva */
+      color: #fdfcf9;
+      box-shadow: 0 3px 10px rgba(107,143,63,0.35);
+      border: 1px solid #577333;
+    }
+
+    .btn-main:disabled {
+      background: #b4c59a;
+      border-color: #9eae83;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-ghost {
+      background: #efe3d5;
+      color: #4b5563;
+      border: 1px solid #d6c2ab;
+    }
+
+    .btn-main:hover:not(:disabled),
+    .btn-ghost:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+      opacity: 0.97;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .footer-note a {
+      color: #6b8f3f;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-note a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="gift-layout">
+      <header class="gift-header">
+        <h1>Lista de Regalos</h1>
+        <p>
+          Para celebrar con nosotros, puedes elegir uno de estos regalos de experiencia para
+          <span class="couple-names">[Nombres de los novios]</span>.
+        </p>
+        <div class="notice-box">
+          <strong>¿Cómo funciona?</strong><br />
+          1) Haz clic en <strong>“Reservar y ver datos de pago”</strong>.<br />
+          2) Escribe tu nombre para que sepamos quién hizo la reserva.<br />
+          3) Se abrirá el enlace con el <strong>código QR / datos de pago</strong>.<br />
+          4) Tienes <strong>4 horas</strong> para confirmar el pago desde que reservas. Después, el regalo vuelve a estar disponible en este dispositivo.
+        </div>
+      </header>
+
+      <section id="gift-grid" class="gift-grid"></section>
+
+      <div class="footer-note">
+        Si tienes dudas o quieres combinar varios regalos, puedes escribirnos por WhatsApp:
+        <a href="https://wa.me/00000000000" target="_blank" rel="noopener noreferrer">contacto novios</a>
+        <!-- Cambia el número por el tuyo -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // ⏱ Duración de la reserva: 4 horas
+      var RESERVATION_HOURS = 4;
+      var RESERVATION_MS = RESERVATION_HOURS * 60 * 60 * 1000;
+      var STORAGE_KEY = "weddingGiftReservations_v1";
+
+      // 💝 Aquí configuras tus regalos
+      // Cambia títulos, descripciones, imágenes y links de pago (QR, Yape, Plin, etc.)
+      var gifts = [
+        {
+          id: "viaje-playa",
+          title: "Escapada romántica a la playa",
+          description: "Nos regalas una noche de hotel frente al mar para desconectar después de la boda.",
+          imageUrl: "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg",
+          paymentUrl: "https://tu-link-o-qr.com/viaje-playa"
+        },
+        {
+          id: "cena-gourmet",
+          title: "Cena gourmet para dos",
+          description: "Una cena especial en nuestro restaurante favorito para seguir celebrando.",
+          imageUrl: "https://images.pexels.com/photos/587741/pexels-photo-587741.jpeg",
+          paymentUrl: "https://tu-link-o-qr.com/cena-gourmet"
+        },
+        {
+          id: "spa-relax",
+          title: "Día de spa y relax",
+          description: "Masajes y spa para recargar energías tras la locura de la boda.",
+          imageUrl: "https://images.pexels.com/photos/3738345/pexels-photo-3738345.jpeg",
+          paymentUrl: "https://tu-link-o-qr.com/spa-relax"
+        }
+      ];
+      // NOTA:
+      // - imageUrl: puedes usar imágenes tuyas subidas al mismo repo (ej: "img/viaje.jpg")
+      // - paymentUrl: pon aquí el enlace donde muestras tu QR o página de pago
+
+      var reservations = {};
+      var gridEl = document.getElementById("gift-grid");
+
+      function loadReservations() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          var data = JSON.parse(raw);
+          var now = Date.now();
+          Object.keys(data).forEach(function (id) {
+            var res = data[id];
+            if (!res || !res.timestamp) return;
+            if (now - res.timestamp < RESERVATION_MS) {
+              reservations[id] = res;
+            }
+          });
+        } catch (e) {
+          console.warn("No se pudieron cargar las reservas:", e);
+        }
+      }
+
+      function saveReservations() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
+        } catch (e) {
+          console.warn("No se pudieron guardar las reservas:", e);
+        }
+      }
+
+      function getTimeLeft(res) {
+        var now = Date.now();
+        var elapsed = now - res.timestamp;
+        var remaining = RESERVATION_MS - elapsed;
+        return remaining > 0 ? remaining : 0;
+      }
+
+      function formatTime(ms) {
+        var totalSeconds = Math.floor(ms / 1000);
+        var hours = Math.floor(totalSeconds / 3600);
+        var minutes = Math.floor((totalSeconds % 3600) / 60);
+        return hours + "h " + (minutes < 10 ? "0" + minutes : minutes) + "m";
+      }
+
+      function render() {
+        gridEl.innerHTML = "";
+
+        gifts.forEach(function (gift) {
+          var card = document.createElement("article");
+          card.className = "gift-card";
+
+          var imgWrap = document.createElement("div");
+          imgWrap.className = "gift-image-wrapper";
+
+          var img = document.createElement("img");
+          img.className = "gift-image";
+          img.src = gift.imageUrl;
+          img.alt = gift.title;
+
+          imgWrap.appendChild(img);
+          card.appendChild(imgWrap);
+
+          var body = document.createElement("div");
+          body.className = "gift-body";
+
+          var title = document.createElement("h2");
+          title.className = "gift-title";
+          title.textContent = gift.title;
+
+          var desc = document.createElement("p");
+          desc.className = "gift-desc";
+          desc.textContent = gift.description;
+
+          var meta = document.createElement("div");
+          meta.className = "gift-meta";
+          var metaLeft = document.createElement("span");
+          metaLeft.textContent = "Regalo de experiencia";
+          var metaRight = document.createElement("span");
+          metaRight.textContent = "ID: " + gift.id;
+          meta.appendChild(metaLeft);
+          meta.appendChild(metaRight);
+
+          body.appendChild(title);
+          body.appendChild(desc);
+          body.appendChild(meta);
+
+          var status = document.createElement("div");
+          var reservation = reservations[gift.id];
+          var now = Date.now();
+
+          if (reservation && now - reservation.timestamp < RESERVATION_MS) {
+            var timeLeft = getTimeLeft(reservation);
+            status.className = "gift-status status-reserved";
+            status.textContent =
+              "Reservado por " +
+              reservation.name +
+              " · tiempo restante: " +
+              formatTime(timeLeft);
+          } else {
+            status.className = "gift-status status-available";
+            status.textContent = "Disponible";
+          }
+
+          body.appendChild(status);
+
+          var actions = document.createElement("div");
+          actions.className = "gift-actions";
+
+          var mainBtn = document.createElement("button");
+          mainBtn.className = "btn-main";
+          mainBtn.textContent = "Reservar y ver datos de pago";
+
+          var ghostBtn = document.createElement("button");
+          ghostBtn.className = "btn-ghost";
+          ghostBtn.textContent = "Solo ver datos de pago";
+
+          if (reservation && now - reservation.timestamp < RESERVATION_MS) {
+            mainBtn.disabled = true;
+          }
+
+          mainBtn.addEventListener("click", function () {
+            handleReservation(gift);
+          });
+
+          ghostBtn.addEventListener("click", function () {
+            window.open(gift.paymentUrl, "_blank", "noopener");
+          });
+
+          actions.appendChild(mainBtn);
+          actions.appendChild(ghostBtn);
+          body.appendChild(actions);
+
+          card.appendChild(body);
+          gridEl.appendChild(card);
+        });
+      }
+
+      function handleReservation(gift) {
+        var current = reservations[gift.id];
+        var now = Date.now();
+
+        if (current && now - current.timestamp < RESERVATION_MS) {
+          alert("Este regalo ya está reservado en este dispositivo.");
+          return;
+        }
+
+        var name = prompt("Escribe tu nombre y apellido para la reserva:");
+        if (!name) {
+          return;
+        }
+
+        reservations[gift.id] = {
+          name: name.trim(),
+          timestamp: Date.now()
+        };
+
+        saveReservations();
+        render();
+
+        alert(
+          "¡Gracias, " +
+            name +
+            "! Has reservado este regalo durante " +
+            RESERVATION_HOURS +
+            " horas. A continuación verás los datos de pago."
+        );
+
+        window.open(gift.paymentUrl, "_blank", "noopener");
+      }
+
+      function cleanExpiredAndRerender() {
+        var changed = false;
+        var now = Date.now();
+
+        Object.keys(reservations).forEach(function (id) {
+          var r = reservations[id];
+          if (!r || now - r.timestamp >= RESERVATION_MS) {
+            delete reservations[id];
+            changed = true;
+          }
+        });
+
+        if (changed) {
+          saveReservations();
+          render();
+        } else {
+          // Aunque no cambie nada, si hay reservas vigentes,
+          // el tiempo restante debe actualizarse
+          render();
+        }
+      }
+
+      loadReservations();
+      render();
+
+      // Revisar cada 60 segundos si alguna reserva caducó y actualizar tiempos
+      setInterval(cleanExpiredAndRerender, 60000);
+    })();
+  </script>
+</body>
+</html>
